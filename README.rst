@@ -1,5 +1,11 @@
-django-migrate-sql
-==================
+django-migrate-sql-deux
+=======================
+
+.. note::
+
+    This package is a fork of the ``django-migrate-sql`` package, originally published
+    by Bogdan Klichuk. This package appears unmaintained, so we decided to start a fork
+    as we depended on it. Most of the code is from him.
 
 |Build Status| |codecov.io|
 
@@ -56,7 +62,7 @@ Install from PyPi:
 
 ::
 
-    $ pip install django-migrate-sql
+    $ pip install django-migrate-sql-deux
 
 Add ``migrate_sql`` to ``INSTALLED_APPS``:
 
