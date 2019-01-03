@@ -47,7 +47,7 @@ with open('README.rst') as readme_file:
 VERSION = get_version('migrate_sql')
 
 setup(
-    name='django-migrate-sql',
+    name='django-migrate-sql-deux',
     version=VERSION,
     description='Migration support for raw SQL in Django',
     long_description=readme,
