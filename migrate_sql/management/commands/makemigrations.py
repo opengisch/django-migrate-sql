@@ -32,6 +32,7 @@ class Command(MakeMigrationsCommand):
         self.empty = options.get('empty', False)
         self.migration_name = options.get('name', None)
         self.exit_code = options.get('exit_code', False)
+        check_changes = options.get('check_changes', False)
 
         # Make sure the app they asked for exists
         app_labels = set(app_labels)
@@ -131,7 +132,7 @@ class Command(MakeMigrationsCommand):
 
             if self.exit_code:
                 sys.exit(1)
-            else:
-                return
-
-        self.write_migration_files(changes)
+        else:
+            self.write_migration_files(changes)
+            if check_changes:
+                sys.exit(1)
