@@ -32,6 +32,7 @@ class Command(MakeMigrationsCommand):
         self.empty = options.get('empty', False)
         self.migration_name = options.get('name', None)
         self.exit_code = options.get('exit_code', False)
+        self.include_header = options.get('include_header', True)
         check_changes = options.get('check_changes', False)
 
         # Make sure the app they asked for exists
