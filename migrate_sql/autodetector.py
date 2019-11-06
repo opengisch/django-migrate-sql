@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db.migrations.autodetector import MigrationAutodetector as DjangoMigrationAutodetector
 from django.db.migrations.operations import RunSQL
+from django.utils.datastructures import OrderedSet
 
 from migrate_sql.operations import (AlterSQL, ReverseAlterSQL, CreateSQL, DeleteSQL, AlterSQLState)
 from migrate_sql.graph import SQLStateGraph
@@ -59,6 +60,28 @@ def is_sql_equal(sqls1, sqls2):
     return True
 
 
+def get_ancestors(node):
+    """Logic extracted from Django <2.2 as this is dropped in later versions."""
+    if '_ancestors' not in node.__dict__:
+        ancestors = []
+        for parent in sorted(node.parents, reverse=True):
+            ancestors += get_ancestors(parent)
+        ancestors.append(node.key)
+        node.__dict__['_ancestors'] = list(OrderedSet(ancestors))
+    return node.__dict__['_ancestors']
+
+
+def get_descendants(node):
+    """Logic extracted from Django <2.2 as this is dropped in later versions."""
+    if '_descendants' not in node.__dict__:
+        descendants = []
+        for child in sorted(node.children, reverse=True):
+            descendants += get_descendants(child)
+        descendants.append(node.key)
+        node.__dict__['_descendants'] = list(OrderedSet(descendants))
+    return node.__dict__['_descendants']
+
+
 class MigrationAutodetector(DjangoMigrationAutodetector):
     """
     Substitutes Django's MigrationAutodetector class, injecting SQL migrations logic.
@@ -92,14 +115,14 @@ class MigrationAutodetector(DjangoMigrationAutodetector):
         for key in all_keys:
             node = sql_state.node_map[key]
             sql_item = sql_state.nodes[key]
-            ancs = node.ancestors()[:-1]
+            ancs = get_ancestors(node)[:-1]
             ancs.reverse()
             pos = next((i for i, k in enumerate(result_keys) if k in ancs), len(result_keys))
             result_keys.insert(pos, key)
 
             if key in resolve_keys and not sql_item.replace:
                 # ancestors() and descendants() include key itself, need to cut it out.
-                descs = reversed(node.descendants()[:-1])
+                descs = reversed(get_descendants(node)[:-1])
                 for desc in descs:
                     if desc not in all_keys and desc not in result_keys:
                         result_keys.insert(pos, desc)
