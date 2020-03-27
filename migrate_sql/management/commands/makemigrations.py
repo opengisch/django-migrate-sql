@@ -8,7 +8,7 @@ import sys
 from django.core.management.commands.makemigrations import Command as MakeMigrationsCommand
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations import Migration
-from django.core.management.base import CommandError
+from django.core.management.base import CommandError, no_translations
 from django.db.migrations.questioner import InteractiveMigrationQuestioner
 from django.apps import apps
 from django.db.migrations.state import ProjectState
@@ -19,6 +19,7 @@ from migrate_sql.graph import build_current_graph
 
 class Command(MakeMigrationsCommand):
 
+    @no_translations
     def handle(self, *app_labels, **options):
 
         self.verbosity = options.get('verbosity')
