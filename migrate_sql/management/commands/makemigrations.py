@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 """
 Replaces built-in Django command and forces it generate SQL item modification operations
 into regular Django migrations.
@@ -15,7 +12,6 @@ from django.core.management.base import CommandError
 from django.db.migrations.questioner import InteractiveMigrationQuestioner
 from django.apps import apps
 from django.db.migrations.state import ProjectState
-from django.utils.six import iteritems
 
 from migrate_sql.autodetector import MigrationAutodetector
 from migrate_sql.graph import build_current_graph
@@ -59,7 +55,7 @@ class Command(MakeMigrationsCommand):
         # If app_labels is specified, filter out conflicting migrations for unspecified apps
         if app_labels:
             conflicts = {
-                app_label: conflict for app_label, conflict in iteritems(conflicts)
+                app_label: conflict for app_label, conflict in conflicts.items()
                 if app_label in app_labels
             }
 
