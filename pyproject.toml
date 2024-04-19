@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61.0", "setuptools-scm", "wheel", "setuptools-git-versioning"]
+build-backend = "setuptools.build_meta"
+
+[project]
+requires-python = ">=3.9"
+name = "django-migrate-sql-3"
+authors = [
+    {name = "Bogdan Klichuk", email = "klichuk@github.com"},
+    {name = "Festicket", email = "festicket@github.com"},
+    {name = "Denis Rouzaud", email = "info@opengis.ch"},
+]
+description = "A package parsing the PostgreSQL connection service file"
+keywords =  ["postgres", "service"]
+classifiers = [
+        'Development Status :: 3 - Alpha',
+        'Framework :: Django',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Natural Language :: English',
+        'Framework :: Django :: 4.',
+]
+license = { text = "MIT License" }
+dynamic = ["version", "readme"]
+
+[project.urls]
+homepage = "https://github.com/opengisch/django-migrate-sql"
+repository = "https://github.com/opengisch/django-migrate-sql"
+tracker = "https://github.com/opengisch/django-migrate-sql/issues"
+
+[tool.setuptools-git-versioning]
+enabled = true
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.md"], content-type = "text/markdown"}
+
+[tool.isort]
+profile = "black"
+
+[tool.black]
+line-length = 120
