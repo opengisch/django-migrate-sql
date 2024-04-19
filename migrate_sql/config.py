@@ -1,7 +1,8 @@
-class SQLItem(object):
+class SQLItem:
     """
     Represents any SQL entity (unit), for example function, type, index or trigger.
     """
+
     def __init__(self, name, sql, reverse_sql=None, dependencies=None, replace=False):
         """
         Args:

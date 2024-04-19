@@ -65,4 +65,3 @@ jobs:
         run: |
           ./manage.py migrate
           ./manage.py test
-

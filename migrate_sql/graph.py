@@ -1,17 +1,18 @@
 from collections import defaultdict
 from importlib import import_module
 
-from django.db.migrations.graph import Node, NodeNotFoundError, CircularDependencyError
-from django.conf import settings
 from django.apps import apps
+from django.conf import settings
+from django.db.migrations.graph import CircularDependencyError, Node, NodeNotFoundError
 
-SQL_CONFIG_MODULE = settings.__dict__.get('SQL_CONFIG_MODULE', 'sql_config')
+SQL_CONFIG_MODULE = settings.__dict__.get("SQL_CONFIG_MODULE", "sql_config")
 
 
-class SQLStateGraph(object):
+class SQLStateGraph:
     """
     Represents graph assembled by SQL items as nodes and parent-child relations as arcs.
     """
+
     def __init__(self):
         self.nodes = {}
         self.node_map = {}
@@ -55,23 +56,26 @@ class SQLStateGraph(object):
         for child, parents in self.dependencies.items():
             if child not in self.nodes:
                 raise NodeNotFoundError(
-                    "App %s SQL item dependencies reference nonexistent child node %r" % (
-                        child[0], child),
-                    child
+                    "App {} SQL item dependencies reference nonexistent child node {!r}".format(
+                        child[0], child
+                    ),
+                    child,
                 )
             for parent in parents:
                 if parent not in self.nodes:
                     raise NodeNotFoundError(
-                        "App %s SQL item dependencies reference nonexistent parent node %r" % (
-                            child[0], parent),
-                        parent
+                        "App {} SQL item dependencies reference nonexistent parent node {!r}".format(
+                            child[0], parent
+                        ),
+                        parent,
                     )
                 self.node_map[child].add_parent(self.node_map[parent])
                 self.node_map[parent].add_child(self.node_map[child])
 
         for node in self.nodes:
-            self.ensure_not_cyclic(node,
-                                   lambda x: (parent.key for parent in self.node_map[x].parents))
+            self.ensure_not_cyclic(
+                node, lambda x: (parent.key for parent in self.node_map[x].parents)
+            )
 
     def ensure_not_cyclic(self, start, get_children):
         # Algo from GvR:
@@ -84,8 +88,10 @@ class SQLStateGraph(object):
                 top = stack[-1]
                 for node in get_children(top):
                     if node in stack:
-                        cycle = stack[stack.index(node):]
-                        raise CircularDependencyError(", ".join("%s.%s" % n for n in cycle))
+                        cycle = stack[stack.index(node) :]
+                        raise CircularDependencyError(
+                            ", ".join("%s.%s" % n for n in cycle)
+                        )
                     if node in todo:
                         stack.append(node)
                         todo.remove(node)
@@ -105,7 +111,8 @@ def build_current_graph():
     for app_name, config in apps.app_configs.items():
         try:
             module = import_module(
-                '.'.join((config.module.__name__, SQL_CONFIG_MODULE)))
+                ".".join((config.module.__name__, SQL_CONFIG_MODULE))
+            )
             sql_items = module.sql_items
         except (ImportError, AttributeError):
             continue

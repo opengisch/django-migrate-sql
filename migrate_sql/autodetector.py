@@ -1,17 +1,17 @@
 from django.db.migrations.operations import RunSQL
 from django.utils.datastructures import OrderedSet
 
+from migrate_sql.graph import SQLStateGraph, build_current_graph
 from migrate_sql.operations import (
     AlterSQL,
-    ReverseAlterSQL,
+    AlterSQLState,
     CreateSQL,
     DeleteSQL,
-    AlterSQLState,
+    ReverseAlterSQL,
 )
-from migrate_sql.graph import SQLStateGraph, build_current_graph
 
 
-class SQLBlob(object):
+class SQLBlob:
     pass
 
 

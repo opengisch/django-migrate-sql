@@ -86,7 +86,7 @@ sql_items = [
     SQLItem(
         'make_sum',   # name of the item
         'create or replace function make_sum(a int, b int) returns int as $$ '
-        'begin return a + b; end; ' 
+        'begin return a + b; end; '
         '$$ language plpgsql;',  # forward sql
         reverse_sql='drop function make_sum(int, int);',  # sql for removal
     ),
@@ -132,7 +132,7 @@ class Migration(migrations.Migration):
 Check result in `./manage.py dbshell`:
 
     db_name=# select make_sum(12, 15);
-     make_sum 
+     make_sum
     ----------
            27
     (1 row)
