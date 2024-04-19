@@ -55,7 +55,7 @@ mechanism. Technically creates a sophistication layer on top of the
 
 Install from PyPi:
 
-    $ pip install django-migrate-sql-deux
+    $ pip install django-migrate-sql-3
 
 Add `migrate_sql` to `INSTALLED_APPS`:
 
