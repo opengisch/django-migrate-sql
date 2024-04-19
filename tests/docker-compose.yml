@@ -1,0 +1,55 @@
+# default stack
+
+version: '3.7'
+
+services:
+  django:
+    image: opengisch/django-oapif:latest
+    build:
+      context: ..
+      dockerfile: ./tests/docker/django/Dockerfile
+      cache_from:
+        - opengisch/django-oapif:latest
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - static_volume:/static_volume
+      - media_volume:/media_volume
+    environment:
+      DJANGO_DEBUG: "true"
+      OGCAPIF_HOST: ${OGCAPIF_HOST:?}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?}
+      DJANGO_STATIC_ROOT: /static_volume
+      DJANGO_MEDIA_ROOT: /media_volume
+      POSTGRES_USER: ${POSTGRES_USER:?}
+      POSTGRES_DB: ${POSTGRES_DB:?}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_HOST: ${POSTGRES_HOST:?}
+      POSTGRES_PORT: ${POSTGRES_PORT:?}
+      POSTGRES_SSLMODE: ${POSTGRES_SSLMODE:?}
+      TX_TOKEN: ${TX_TOKEN}
+    command: python3 manage.py runserver 0.0.0.0:8000
+
+  postgres:
+    image: postgis/postgis:13-3.1
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_DB: ${POSTGRES_DB:?}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    # If you need the database to be accessible from the host
+    # uncomment the two lines below
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  static_volume:
+  media_volume:
+  caddy_data:
+  postgres_data:

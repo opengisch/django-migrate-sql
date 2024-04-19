@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.test import TestCase
 
 from migrate_sql.autodetector import is_sql_equal

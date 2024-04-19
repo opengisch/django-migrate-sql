@@ -45,7 +45,7 @@ with open('README.rst') as readme_file:
 VERSION = get_version('migrate_sql')
 
 setup(
-    name='django-migrate-sql-deux',
+    name='django-migrate-sql',
     version=VERSION,
     description='Migration support for raw SQL in Django',
     long_description=readme,
@@ -55,7 +55,7 @@ setup(
     package_dir={'migrate_sql': 'migrate_sql'},
     license='BSD',
     zip_safe=False,
-    url='https://github.com/festicket/django-migrate-sql',
+    url='https://github.com/opengisch/django-migrate-sql',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Framework :: Django',
