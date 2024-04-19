@@ -66,9 +66,7 @@ def item(name, version, dependencies=None):
         + [f"arg{i + 1} int" for i in range(version)]
     )
     sql, reverse_sql = (
-        "CREATE TYPE {name} AS ({args}); -- {ver}".format(
-            name=name, args=args, ver=version
-        ),
+        f"CREATE TYPE {name} AS ({args}); -- {version}",
         f"DROP TYPE {name}",
     )
     return SQLItem(name, sql, reverse_sql, dependencies=dependencies)
@@ -128,18 +126,14 @@ class BaseMigrateSQLTestCase(TestCase):
         loader = MigrationLoader(None, load=True)
         available = loader.disk_migrations.keys()
         for expc_mig, (check_exists, dependencies, op_groups) in expected.items():
-            key = next(
-                (mig for mig in available if mig_name(mig) == mig_name(expc_mig)), None
-            )
+            key = next((mig for mig in available if mig_name(mig) == mig_name(expc_mig)), None)
             if check_exists:
                 self.assertIsNotNone(key, f"Expected migration {expc_mig} not found.")
             else:
                 self.assertIsNone(key, f"Unexpected migration {expc_mig} was found.")
                 continue
             migration = loader.disk_migrations[key]
-            self.assertEqual(
-                {mig_name(dep) for dep in migration.dependencies}, set(dependencies)
-            )
+            self.assertEqual({mig_name(dep) for dep in migration.dependencies}, set(dependencies))
             mig_ops = [(op.__class__.__name__, op.name) for op in migration.operations]
             for op_group in op_groups:
                 self.assertTrue(contains_ordered(mig_ops, op_group))
@@ -251,9 +245,7 @@ class MigrateSQLTestCase(BaseMigrateSQLTestCase):
         super().setUp()
         books = (
             Book(name="Clone Wars", author="John Ben", rating=4, published=True),
-            Book(
-                name="The mysterious dog", author="John Ben", rating=6, published=True
-            ),
+            Book(name="The mysterious dog", author="John Ben", rating=6, published=True),
             Book(name="HTML 5", author="John Ben", rating=9, published=True),
             Book(name="Management", author="John Ben", rating=8, published=False),
             Book(name="Python 3", author="John Ben", rating=3, published=False),
@@ -270,14 +262,10 @@ class MigrateSQLTestCase(BaseMigrateSQLTestCase):
                 result = run_query("SELECT name FROM top_books()")
                 self.assertEqual(result, expected)
             else:
-                result = run_query(
-                    "SELECT COUNT(*) FROM pg_proc WHERE proname = 'top_books'"
-                )
+                result = run_query("SELECT COUNT(*) FROM pg_proc WHERE proname = 'top_books'")
                 self.assertEqual(result, [(0,)])
 
-    def check_migrations(
-        self, content, results, migration_module=None, app_label="test_app"
-    ):
+    def check_migrations(self, content, results, migration_module=None, app_label="test_app"):
         """
         Checks migrations content and results after being run.
         """
@@ -301,9 +289,7 @@ class MigrateSQLTestCase(BaseMigrateSQLTestCase):
                 [[("CreateSQL", "top_books")]],
             ),
         }
-        expected_results = (
-            ("0002", [("HTML 5",), ("Management",), ("The mysterious dog",)]),
-        )
+        expected_results = (("0002", [("HTML 5",), ("Management",), ("The mysterious dog",)]),)
         self.check_migrations(expected_content, expected_results)
 
     def test_migration_change(self):
@@ -325,9 +311,7 @@ class MigrateSQLTestCase(BaseMigrateSQLTestCase):
             ("0002", [("HTML 5",), ("Management",), ("The mysterious dog",)]),
             ("0001", None),
         )
-        self.check_migrations(
-            expected_content, expected_results, "test_app.migrations_change"
-        )
+        self.check_migrations(expected_content, expected_results, "test_app.migrations_change")
 
     def test_migration_replace(self):
         """
@@ -350,9 +334,7 @@ class MigrateSQLTestCase(BaseMigrateSQLTestCase):
             ("0001", None),
             ("0002", [("HTML 5",), ("Management",), ("The mysterious dog",)]),
         )
-        self.check_migrations(
-            expected_content, expected_results, "test_app.migrations_change"
-        )
+        self.check_migrations(expected_content, expected_results, "test_app.migrations_change")
 
     def test_migration_delete(self):
         """
@@ -368,9 +350,7 @@ class MigrateSQLTestCase(BaseMigrateSQLTestCase):
             ),
         }
         expected_results = (("0003", None),)
-        self.check_migrations(
-            expected_content, expected_results, "test_app.migrations_change"
-        )
+        self.check_migrations(expected_content, expected_results, "test_app.migrations_change")
 
     def test_migration_recreate(self):
         """
@@ -390,9 +370,7 @@ class MigrateSQLTestCase(BaseMigrateSQLTestCase):
             ("0003", None),
             ("0002", [("HTML 5",), ("Management",), ("The mysterious dog",)]),
         )
-        self.check_migrations(
-            expected_content, expected_results, "test_app.migrations_recreate"
-        )
+        self.check_migrations(expected_content, expected_results, "test_app.migrations_recreate")
 
 
 class SQLDependenciesTestCase(BaseMigrateSQLTestCase):
@@ -465,9 +443,7 @@ class SQLDependenciesTestCase(BaseMigrateSQLTestCase):
             result = cursor.fetchone()[0]
             self.assertEqual(result, expect)
         else:
-            result = run_query(
-                "SELECT COUNT(*) FROM pg_type WHERE typname = %s", [fetch_type]
-            )
+            result = run_query("SELECT COUNT(*) FROM pg_type WHERE typname = %s", [fetch_type])
             self.assertEqual(result, [(0,)])
 
     def check_migrations(self, content, migrations, module=None, module2=None):

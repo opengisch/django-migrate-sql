@@ -89,9 +89,7 @@ class BaseAlterSQL(MigrateSQLMixin, RunSQL):
     """
 
     def __init__(self, name, sql, reverse_sql=None, state_operations=None, hints=None):
-        super().__init__(
-            sql, reverse_sql=reverse_sql, state_operations=state_operations, hints=hints
-        )
+        super().__init__(sql, reverse_sql=reverse_sql, state_operations=state_operations, hints=hints)
         self.name = name
 
     def deconstruct(self):
