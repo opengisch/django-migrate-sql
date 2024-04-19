@@ -1,17 +1,17 @@
 from django.db.migrations.operations import RunSQL
 from django.utils.datastructures import OrderedSet
 
+from migrate_sql.graph import SQLStateGraph, build_current_graph
 from migrate_sql.operations import (
     AlterSQL,
-    ReverseAlterSQL,
+    AlterSQLState,
     CreateSQL,
     DeleteSQL,
-    AlterSQLState,
+    ReverseAlterSQL,
 )
-from migrate_sql.graph import SQLStateGraph, build_current_graph
 
 
-class SQLBlob(object):
+class SQLBlob:
     pass
 
 
@@ -93,9 +93,7 @@ class MigrationAutodetectorMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.to_sql_graph = build_current_graph()
-        self.from_sql_graph = (
-            getattr(self.from_state, "sql_state", None) or SQLStateGraph()
-        )
+        self.from_sql_graph = getattr(self.from_state, "sql_state", None) or SQLStateGraph()
         self.from_sql_graph.build_graph()
         self._sql_operations = []
 
@@ -123,9 +121,7 @@ class MigrationAutodetectorMixin:
             sql_item = sql_state.nodes[key]
             ancs = get_ancestors(node)[:-1]
             ancs.reverse()
-            pos = next(
-                (i for i, k in enumerate(result_keys) if k in ancs), len(result_keys)
-            )
+            pos = next((i for i, k in enumerate(result_keys) if k in ancs), len(result_keys))
             result_keys.insert(pos, key)
 
             if key in resolve_keys and not sql_item.replace:
@@ -143,10 +139,7 @@ class MigrationAutodetectorMixin:
         Add SQL operation and register it to be used as dependency for further
         sequential operations.
         """
-        deps = [
-            (dp[0], SQL_BLOB, dp[1], self._sql_operations.get(dp))
-            for dp in dependencies
-        ]
+        deps = [(dp[0], SQL_BLOB, dp[1], self._sql_operations.get(dp)) for dp in dependencies]
 
         self.add_operation(app_label, operation, dependencies=deps)
         self._sql_operations[(app_label, sql_name)] = operation
@@ -161,17 +154,11 @@ class MigrationAutodetectorMixin:
             app_label, sql_name = key
             old_item = self.from_sql_graph.nodes[key]
             new_item = self.to_sql_graph.nodes[key]
-            if (
-                not old_item.reverse_sql
-                or old_item.reverse_sql == RunSQL.noop
-                or new_item.replace
-            ):
+            if not old_item.reverse_sql or old_item.reverse_sql == RunSQL.noop or new_item.replace:
                 continue
 
             # migrate backwards
-            operation = ReverseAlterSQL(
-                sql_name, old_item.reverse_sql, reverse_sql=old_item.sql
-            )
+            operation = ReverseAlterSQL(sql_name, old_item.reverse_sql, reverse_sql=old_item.sql)
             sql_deps = [n.key for n in self.from_sql_graph.node_map[key].children]
             sql_deps.append(key)
             self.add_sql_operation(app_label, sql_name, operation, sql_deps)
@@ -199,9 +186,7 @@ class MigrationAutodetectorMixin:
                 operation_cls = CreateSQL
                 kwargs = {"dependencies": list(sql_deps)}
 
-            operation = operation_cls(
-                sql_name, new_item.sql, reverse_sql=reverse_sql, **kwargs
-            )
+            operation = operation_cls(sql_name, new_item.sql, reverse_sql=reverse_sql, **kwargs)
             sql_deps.append(key)
             self.add_sql_operation(app_label, sql_name, operation, sql_deps)
 
@@ -234,9 +219,7 @@ class MigrationAutodetectorMixin:
         for key in delete_keys:
             app_label, sql_name = key
             old_node = self.from_sql_graph.nodes[key]
-            operation = DeleteSQL(
-                sql_name, old_node.reverse_sql, reverse_sql=old_node.sql
-            )
+            operation = DeleteSQL(sql_name, old_node.reverse_sql, reverse_sql=old_node.sql)
             sql_deps = [n.key for n in self.from_sql_graph.node_map[key].children]
             sql_deps.append(key)
             self.add_sql_operation(app_label, sql_name, operation, sql_deps)

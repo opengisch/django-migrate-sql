@@ -8,4 +8,4 @@ class Book(models.Model):
     published = models.BooleanField(default=True)
 
     def __str__(self):
-        return "Book [{}]".format(self.name)
+        return f"Book [{self.name}]"
