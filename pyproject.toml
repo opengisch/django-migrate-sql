@@ -18,7 +18,9 @@ classifiers = [
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',
-        'Framework :: Django :: 4.',
+        'Framework :: Django :: 3.2',
+        'Framework :: Django :: 4.2',
+        'Framework :: Django :: 5.0',
 ]
 license = { text = "MIT License" }
 dynamic = ["version", "readme"]
